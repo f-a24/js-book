@@ -4,9 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node-dev --respawn index.ts",
-    "fmt": "prettier --write index.ts",
-    "gen": "graphql-codegen --config codegen.yml"
+    "dev": "ts-node-dev --respawn ./src/index.ts",
+    "fmt": "prettier --write ./src/**/*.ts",
+    "gen": "graphql-codegen --config ./codegen.yml"
   },
   "prettier": {
     "singleQuote": true,
@@ -17,13 +17,19 @@
     "@graphql-tools/graphql-file-loader": "^7.3.3",
     "@graphql-tools/load": "^7.4.1",
     "@graphql-tools/schema": "^8.3.1",
-    "apollo-server": "^3.5.0",
-    "graphql": "^16.0.1"
+    "apollo-server-express": "^3.5.0",
+    "express": "^4.17.1",
+    "graphql": "^16.0.1",
+    "graphql-playground-middleware-express": "^1.7.23",
+    "mongodb": "^4.2.0",
+    "node-fetch": "2.6.6"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^2.2.2",
     "@graphql-codegen/typescript": "^2.3.1",
     "@graphql-codegen/typescript-resolvers": "^2.4.0",
+    "@types/node-fetch": "^2.5.12",
+    "dotenv": "^10.0.0",
     "prettier": "^2.4.1",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.4.4"
