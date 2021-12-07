@@ -1,4 +1,5 @@
-import { ObjectId } from 'bson';
+import { ObjectId } from 'mongodb';
+import fetch from 'node-fetch';
 import { authorizeWithGithub } from '../lib';
 import {
   MutationResolvers,
