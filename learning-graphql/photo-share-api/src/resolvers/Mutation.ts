@@ -9,7 +9,7 @@ import {
 import { TagModel, UserModel } from '../types/models';
 
 const Mutation: MutationResolvers = {
-  async postPhoto(parent, args, { db, currentUser }) {
+  async postPhoto(parent, args, { db, currentUser, pubsub }) {
     if (!currentUser)
       throw new Error('only an authorized user can post a photo');
 
@@ -20,8 +20,7 @@ const Mutation: MutationResolvers = {
     };
 
     const { insertedId } = await db.collection('photos').insertOne(data);
-
-    return {
+    const newPhoto = {
       id: insertedId.toString(),
       ...args.input,
       category: args.input.category || PhotoCategory.Portrait,
@@ -31,6 +30,9 @@ const Mutation: MutationResolvers = {
       taggedUsers: [],
       created: new Date()
     };
+    pubsub.publish('PHOTO_ADDED', { newPhoto });
+
+    return newPhoto;
   },
   async tagPhoto(parent, args, { db }) {
     await db
@@ -43,7 +45,7 @@ const Mutation: MutationResolvers = {
 
     return photo!;
   },
-  async githubAuth(parent, { code }, { db }) {
+  async githubAuth(parent, { code }, { db, pubsub }) {
     const { CLIENT_ID, CLIENT_SECRET } = process.env;
     const { message, access_token, avatar_url, login, name } =
       await authorizeWithGithub({
@@ -60,22 +62,22 @@ const Mutation: MutationResolvers = {
       avatar: avatar_url
     };
 
-    await db
+    const { upsertedCount } = await db
       .collection('users')
       .replaceOne({ githubLogin: login }, data, { upsert: true });
+    
+    const newUser = {
+      githubLogin: login,
+      name,
+      avatar: avatar_url,
+      postedPhotos: [],
+      inPhotos: []
+    }
+    upsertedCount > 0 && pubsub.publish('USER_ADDED', { newUser });
 
-    return {
-      user: {
-        githubLogin: login,
-        name,
-        avatar: avatar_url,
-        postedPhotos: [],
-        inPhotos: []
-      },
-      token: access_token
-    };
+    return { user: newUser, token: access_token };
   },
-  async addFakeUsers(parent, { count }, { db }) {
+  async addFakeUsers(parent, { count }, { db, pubsub }) {
     const randomUserApi = `https://randomuser.me/api/?results=${count}`;
     type ResRandomUserApi = {
       login: {
@@ -110,6 +112,7 @@ const Mutation: MutationResolvers = {
       postedPhotos: [],
       inPhotos: []
     }));
+    users.forEach(newUser => pubsub.publish('USER_ADDED', { newUser }));
 
     return users;
   },

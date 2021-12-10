@@ -8,15 +8,13 @@ const Type: Resolvers = {
     id: parent =>
       parent.id || (parent as unknown as WithId<PhotoModel>)._id.toString(),
     url: parent =>
-      `https://yoursite.com/img/${(
-        parent as unknown as WithId<PhotoModel>
-      )._id.toString()}.jpg`,
+      `https://yoursite.com/img/${
+        parent.id || (parent as unknown as WithId<PhotoModel>)._id.toString()
+      }.jpg`,
     postedBy: async (parent, args, { db }) => {
-      const user = await db
-        .collection<User>('users')
-        .findOne({
-          githubLogin: (parent as unknown as WithId<PhotoModel>).userID!
-        });
+      const user = await db.collection<User>('users').findOne({
+        githubLogin: (parent as unknown as WithId<PhotoModel>).userID!
+      });
       return user!;
     },
     taggedUsers: async (parent, args, { db }) => {

@@ -1,11 +1,15 @@
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
+import { createServer } from 'http';
 import expressPlayground from 'graphql-playground-middleware-express';
+import { PubSub } from 'graphql-subscriptions';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { loadSchemaSync } from '@graphql-tools/load';
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 import { addResolversToSchema } from '@graphql-tools/schema';
 import { MongoClient } from 'mongodb';
 import resolvers from './resolvers';
+import { execute, subscribe } from 'graphql';
 require('dotenv').config();
 
 const schema = loadSchemaSync('./schema.graphql', {
@@ -17,9 +21,33 @@ const startServer = () => {
   const client = new MongoClient(MONGO_DB);
   client.connect(async () => {
     const db = client.db();
+    const pubsub = new PubSub();
+    const app = express();
+    const httpServer = createServer(app);
 
     const schemaWithResolvers = addResolversToSchema({ schema, resolvers });
-    const app = express();
+    const subscriptionServer = SubscriptionServer.create(
+      {
+        schema: schemaWithResolvers,
+        execute,
+        subscribe,
+        onConnect: async (connectionParams: { authorization?: string }) => {
+          if (connectionParams.authorization) {
+            const githubToken = connectionParams.authorization;
+            const currentUser = await db
+              .collection('users')
+              .findOne({ githubToken });
+            return { db, currentUser, pubsub };
+          }
+          throw new Error('Missing auth token!');
+        }
+      },
+      {
+        server: httpServer,
+        path: '/graphql'
+      }
+    );
+
     const server = new ApolloServer({
       schema: schemaWithResolvers,
       context: async ({ req }) => {
@@ -27,15 +55,32 @@ const startServer = () => {
         const currentUser = await db
           .collection('users')
           .findOne({ githubToken });
-        return { db, currentUser };
-      }
+        return { db, currentUser, pubsub };
+      },
+      plugins: [
+        {
+          async serverWillStart() {
+            return {
+              async drainServer() {
+                subscriptionServer.close();
+              }
+            };
+          }
+        }
+      ]
     });
     await server.start();
     server.applyMiddleware({ app });
 
     app.get('/', (req, res) => res.end('Welcome to the PhotoShare API'));
-    app.get('/playground', expressPlayground({ endpoint: '/graphql' }));
-    app.listen({ port: 4000 }, () =>
+    app.get(
+      '/playground',
+      expressPlayground({
+        endpoint: '/graphql',
+        subscriptionEndpoint: '/graphql'
+      })
+    );
+    httpServer.listen({ port: 4000 }, () =>
       console.log(`GraphQL Service running on ${server.graphqlPath}`)
     );
   });
