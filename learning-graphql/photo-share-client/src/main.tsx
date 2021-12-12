@@ -4,12 +4,15 @@ import {
   ApolloClient,
   ApolloProvider,
   createHttpLink,
-  InMemoryCache
+  InMemoryCache,
+  split
 } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
+import { WebSocketLink } from '@apollo/client/link/ws';
 import { LocalStorageWrapper, persistCache } from 'apollo3-cache-persist';
 import './index.css';
 import App from './App';
+import { getMainDefinition } from '@apollo/client/utilities';
 
 const cache = new InMemoryCache();
 await persistCache({
@@ -33,8 +36,30 @@ const authLink = setContext((_, { headers }) => ({
   }
 }));
 
+const wsLink = new WebSocketLink({
+  uri: 'ws://localhost:4000/graphql',
+  options: {
+    reconnect: true,
+    connectionParams: {
+      authorization: localStorage.getItem('token')
+    }
+  }
+});
+
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === 'OperationDefinition' &&
+      definition.operation === 'subscription'
+    );
+  },
+  wsLink,
+  authLink.concat(httpLink)
+);
+
 const client = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: splitLink,
   cache
 });
 

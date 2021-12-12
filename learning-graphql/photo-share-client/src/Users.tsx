@@ -36,17 +36,7 @@ const UserList: VFC<UserListProps> = ({
   refetchUsers
 }) => {
   const [addFakeUsers] = useAddFakeUsersMutation({
-    variables: { count: 1 },
-    update: (cache, { data }) => {
-      const { addFakeUsers } = data!;
-      const cacheData = cache.readQuery<AllUsersQuery>({ query: ROOT_QUERY })!;
-      const newData: AllUsersQuery = {
-        ...cacheData,
-        totalUsers: cacheData.totalUsers + addFakeUsers.length,
-        allUsers: [...cacheData.allUsers, ...addFakeUsers]
-      };
-      cache.writeQuery({ query: ROOT_QUERY, data: newData });
-    }
+    variables: { count: 1 }
   });
 
   return (

@@ -110,6 +110,12 @@ export type QueryAllPhotosArgs = {
   after?: InputMaybe<Scalars['DateTime']>;
 };
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  newPhoto: Photo;
+  newUser: User;
+};
+
 export type User = {
   __typename?: 'User';
   avatar?: Maybe<Scalars['String']>;
@@ -125,6 +131,11 @@ export type AllUsersQueryVariables = Exact<{ [key: string]: never; }>;
 export type AllUsersQuery = { __typename?: 'Query', totalUsers: number, allUsers: Array<{ __typename?: 'User', githubLogin: string, name?: string | null | undefined, avatar?: string | null | undefined }>, me?: { __typename?: 'User', githubLogin: string, name?: string | null | undefined, avatar?: string | null | undefined } | null | undefined };
 
 export type UserInfoFragment = { __typename?: 'User', githubLogin: string, name?: string | null | undefined, avatar?: string | null | undefined };
+
+export type NewUserSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NewUserSubscription = { __typename?: 'Subscription', newUser: { __typename?: 'User', githubLogin: string, name?: string | null | undefined, avatar?: string | null | undefined } };
 
 export type GithubAuthMutationVariables = Exact<{
   code: Scalars['String'];
@@ -185,6 +196,37 @@ export function useAllUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<A
 export type AllUsersQueryHookResult = ReturnType<typeof useAllUsersQuery>;
 export type AllUsersLazyQueryHookResult = ReturnType<typeof useAllUsersLazyQuery>;
 export type AllUsersQueryResult = Apollo.QueryResult<AllUsersQuery, AllUsersQueryVariables>;
+export const NewUserDocument = gql`
+    subscription newUser {
+  newUser {
+    githubLogin
+    name
+    avatar
+  }
+}
+    `;
+
+/**
+ * __useNewUserSubscription__
+ *
+ * To run a query within a React component, call `useNewUserSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useNewUserSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewUserSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useNewUserSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewUserSubscription, NewUserSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<NewUserSubscription, NewUserSubscriptionVariables>(NewUserDocument, options);
+      }
+export type NewUserSubscriptionHookResult = ReturnType<typeof useNewUserSubscription>;
+export type NewUserSubscriptionResult = Apollo.SubscriptionResult<NewUserSubscription>;
 export const GithubAuthDocument = gql`
     mutation githubAuth($code: String!) {
   githubAuth(code: $code) {
