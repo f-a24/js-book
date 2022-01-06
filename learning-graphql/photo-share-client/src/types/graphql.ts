@@ -14,6 +14,7 @@ export type Scalars = {
   Int: number;
   Float: number;
   DateTime: any;
+  Upload: any;
 };
 
 export type AuthPayload = {
@@ -81,6 +82,7 @@ export enum PhotoCategory {
 export type PostPhotoInput = {
   category?: InputMaybe<PhotoCategory>;
   description?: InputMaybe<Scalars['String']>;
+  file: Scalars['Upload'];
   name: Scalars['String'];
 };
 
@@ -128,14 +130,14 @@ export type User = {
 export type AllUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AllUsersQuery = { __typename?: 'Query', totalUsers: number, allUsers: Array<{ __typename?: 'User', githubLogin: string, name?: string | null | undefined, avatar?: string | null | undefined }>, me?: { __typename?: 'User', githubLogin: string, name?: string | null | undefined, avatar?: string | null | undefined } | null | undefined };
+export type AllUsersQuery = { __typename?: 'Query', totalUsers: number, totalPhotos: number, allUsers: Array<{ __typename?: 'User', githubLogin: string, name?: string | null | undefined, avatar?: string | null | undefined }>, me?: { __typename?: 'User', githubLogin: string, name?: string | null | undefined, avatar?: string | null | undefined } | null | undefined, allPhotos: Array<{ __typename?: 'Photo', id: string, name: string, url: string }> };
 
 export type UserInfoFragment = { __typename?: 'User', githubLogin: string, name?: string | null | undefined, avatar?: string | null | undefined };
 
-export type NewUserSubscriptionVariables = Exact<{ [key: string]: never; }>;
+export type Unnamed_1_SubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type NewUserSubscription = { __typename?: 'Subscription', newUser: { __typename?: 'User', githubLogin: string, name?: string | null | undefined, avatar?: string | null | undefined } };
+export type Unnamed_1_Subscription = { __typename?: 'Subscription', newUser: { __typename?: 'User', githubLogin: string, name?: string | null | undefined, avatar?: string | null | undefined } };
 
 export type GithubAuthMutationVariables = Exact<{
   code: Scalars['String'];
@@ -143,6 +145,13 @@ export type GithubAuthMutationVariables = Exact<{
 
 
 export type GithubAuthMutation = { __typename?: 'Mutation', githubAuth: { __typename?: 'AuthPayload', token: string } };
+
+export type PostPhotoMutationVariables = Exact<{
+  input: PostPhotoInput;
+}>;
+
+
+export type PostPhotoMutation = { __typename?: 'Mutation', postPhoto: { __typename?: 'Photo', id: string, name: string, url: string } };
 
 export type AddFakeUsersMutationVariables = Exact<{
   count: Scalars['Int'];
@@ -161,11 +170,17 @@ export const UserInfoFragmentDoc = gql`
 export const AllUsersDocument = gql`
     query allUsers {
   totalUsers
+  totalPhotos
   allUsers {
     ...userInfo
   }
   me {
     ...userInfo
+  }
+  allPhotos {
+    id
+    name
+    url
   }
 }
     ${UserInfoFragmentDoc}`;
@@ -196,8 +211,8 @@ export function useAllUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<A
 export type AllUsersQueryHookResult = ReturnType<typeof useAllUsersQuery>;
 export type AllUsersLazyQueryHookResult = ReturnType<typeof useAllUsersLazyQuery>;
 export type AllUsersQueryResult = Apollo.QueryResult<AllUsersQuery, AllUsersQueryVariables>;
-export const NewUserDocument = gql`
-    subscription newUser {
+export const Document = gql`
+    subscription {
   newUser {
     githubLogin
     name
@@ -207,26 +222,26 @@ export const NewUserDocument = gql`
     `;
 
 /**
- * __useNewUserSubscription__
+ * __useSubscription__
  *
- * To run a query within a React component, call `useNewUserSubscription` and pass it any options that fit your needs.
- * When your component renders, `useNewUserSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useSubscription` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useNewUserSubscription({
+ * const { data, loading, error } = useSubscription({
  *   variables: {
  *   },
  * });
  */
-export function useNewUserSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewUserSubscription, NewUserSubscriptionVariables>) {
+export function useSubscription(baseOptions?: Apollo.SubscriptionHookOptions<Subscription, SubscriptionVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useSubscription<NewUserSubscription, NewUserSubscriptionVariables>(NewUserDocument, options);
+        return Apollo.useSubscription<Subscription, SubscriptionVariables>(Document, options);
       }
-export type NewUserSubscriptionHookResult = ReturnType<typeof useNewUserSubscription>;
-export type NewUserSubscriptionResult = Apollo.SubscriptionResult<NewUserSubscription>;
+export type SubscriptionHookResult = ReturnType<typeof useSubscription>;
+export type SubscriptionResult = Apollo.SubscriptionResult<Subscription>;
 export const GithubAuthDocument = gql`
     mutation githubAuth($code: String!) {
   githubAuth(code: $code) {
@@ -260,6 +275,41 @@ export function useGithubAuthMutation(baseOptions?: Apollo.MutationHookOptions<G
 export type GithubAuthMutationHookResult = ReturnType<typeof useGithubAuthMutation>;
 export type GithubAuthMutationResult = Apollo.MutationResult<GithubAuthMutation>;
 export type GithubAuthMutationOptions = Apollo.BaseMutationOptions<GithubAuthMutation, GithubAuthMutationVariables>;
+export const PostPhotoDocument = gql`
+    mutation postPhoto($input: PostPhotoInput!) {
+  postPhoto(input: $input) {
+    id
+    name
+    url
+  }
+}
+    `;
+export type PostPhotoMutationFn = Apollo.MutationFunction<PostPhotoMutation, PostPhotoMutationVariables>;
+
+/**
+ * __usePostPhotoMutation__
+ *
+ * To run a mutation, you first call `usePostPhotoMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePostPhotoMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [postPhotoMutation, { data, loading, error }] = usePostPhotoMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function usePostPhotoMutation(baseOptions?: Apollo.MutationHookOptions<PostPhotoMutation, PostPhotoMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<PostPhotoMutation, PostPhotoMutationVariables>(PostPhotoDocument, options);
+      }
+export type PostPhotoMutationHookResult = ReturnType<typeof usePostPhotoMutation>;
+export type PostPhotoMutationResult = Apollo.MutationResult<PostPhotoMutation>;
+export type PostPhotoMutationOptions = Apollo.BaseMutationOptions<PostPhotoMutation, PostPhotoMutationVariables>;
 export const AddFakeUsersDocument = gql`
     mutation addFakeUsers($count: Int!) {
   addFakeUsers(count: $count) {

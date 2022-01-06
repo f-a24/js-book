@@ -16,6 +16,8 @@ enum PhotoCategory {
   GRAPHIC
 }
 
+scalar Upload
+
 type Photo {
   id: ID!
   url: String!
@@ -32,6 +34,7 @@ input PostPhotoInput {
   name: String!
   category: PhotoCategory=PORTRAIT
   description: String
+  file: Upload!
 }
 
 type AuthPayload {

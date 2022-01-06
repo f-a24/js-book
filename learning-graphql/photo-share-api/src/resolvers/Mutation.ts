@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import fetch from 'node-fetch';
-import { authorizeWithGithub } from '../lib';
+import path from 'path';
+import { authorizeWithGithub, uploadStream } from '../lib';
 import {
   MutationResolvers,
   Photo,
@@ -30,6 +31,18 @@ const Mutation: MutationResolvers = {
       taggedUsers: [],
       created: new Date()
     };
+
+    const toPath = path.join(
+      __dirname,
+      '..',
+      'assets',
+      'photos',
+      `${newPhoto.id}.jpg`
+    );
+    const { createReadStream } = await args.input.file;
+    const stream = createReadStream();
+    await uploadStream(stream, toPath);
+
     pubsub.publish('PHOTO_ADDED', { newPhoto });
 
     return newPhoto;
@@ -65,14 +78,14 @@ const Mutation: MutationResolvers = {
     const { upsertedCount } = await db
       .collection('users')
       .replaceOne({ githubLogin: login }, data, { upsert: true });
-    
+
     const newUser = {
       githubLogin: login,
       name,
       avatar: avatar_url,
       postedPhotos: [],
       inPhotos: []
-    }
+    };
     upsertedCount > 0 && pubsub.publish('USER_ADDED', { newUser });
 
     return { user: newUser, token: access_token };

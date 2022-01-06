@@ -5,6 +5,8 @@ generates:
     config:
       useIndexSignature: true
       contextType: ../context#Context
+      scalars:
+        Upload: ../scalars#Upload
     plugins:
       - typescript
       - typescript-resolvers

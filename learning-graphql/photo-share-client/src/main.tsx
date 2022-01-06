@@ -3,16 +3,16 @@ import ReactDOM from 'react-dom';
 import {
   ApolloClient,
   ApolloProvider,
-  createHttpLink,
   InMemoryCache,
   split
 } from '@apollo/client';
+import { getMainDefinition } from '@apollo/client/utilities';
 import { setContext } from '@apollo/client/link/context';
 import { WebSocketLink } from '@apollo/client/link/ws';
 import { LocalStorageWrapper, persistCache } from 'apollo3-cache-persist';
+import { createUploadLink } from 'apollo-upload-client';
 import './index.css';
 import App from './App';
-import { getMainDefinition } from '@apollo/client/utilities';
 
 const cache = new InMemoryCache();
 await persistCache({
@@ -25,7 +25,7 @@ if (localStorage['apollo-cache-persist']) {
   cache.restore(cacheData);
 }
 
-const httpLink = createHttpLink({
+const httpLink = createUploadLink({
   uri: 'http://localhost:4000/graphql'
 });
 

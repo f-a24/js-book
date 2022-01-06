@@ -1,5 +1,5 @@
 import React, { useEffect, useState, VFC } from 'react';
-import { useHistory } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
 import { gql, useApolloClient } from '@apollo/client';
 import { ROOT_QUERY } from './App';
 import { useAllUsersQuery, useGithubAuthMutation } from './types/graphql';
@@ -38,6 +38,7 @@ const CurrentUser: VFC<CurrentUserProps> = ({ name, avatar, logout }) => (
     {avatar && <img src={avatar} alt="" />}
     {name && <h1>{name}</h1>}
     <button onClick={logout}>logout</button>
+    <NavLink to="/newPhoto">Post Photo</NavLink>
   </div>
 );
 

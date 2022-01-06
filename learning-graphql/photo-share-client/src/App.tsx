@@ -1,19 +1,27 @@
 import React, { useEffect, useRef, VFC } from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Switch, Route, useLocation } from 'react-router-dom';
 import { gql, useApolloClient } from '@apollo/client';
 import AuthorizedUser from './AuthorizedUser';
 import Users from './Users';
 import { Subscription } from 'zen-observable-ts';
 import { AllUsersQuery } from './types/graphql';
+import Photos from './Photos';
+import PostPhoto from './PostPhoto';
 
 export const ROOT_QUERY = gql`
   query allUsers {
     totalUsers
+    totalPhotos
     allUsers {
       ...userInfo
     }
     me {
       ...userInfo
+    }
+    allPhotos {
+      id
+      name
+      url
     }
   }
 
@@ -36,6 +44,7 @@ const LISTEN_FOR_USERS = gql`
 
 const App: VFC = () => {
   const client = useApolloClient();
+  const location = useLocation();
   const listenForUsers = useRef<Subscription | null>(null);
 
   useEffect(() => {
@@ -48,19 +57,31 @@ const App: VFC = () => {
           totalUsers: data.totalUsers + 1,
           allUsers: [...data.allUsers, newUser]
         };
-        client.writeQuery({ query: ROOT_QUERY, data: newData })
+        client.writeQuery({ query: ROOT_QUERY, data: newData });
       });
 
-      return () => {
-        listenForUsers.current!.unsubscribe()
-      }
+    return () => {
+      listenForUsers.current!.unsubscribe();
+    };
   }, []);
+
   return (
     <BrowserRouter>
-      <div>
-        <AuthorizedUser />
-        <Users />
-      </div>
+      <Switch>
+        <Route
+          exact
+          path="/"
+          component={() => (
+            <>
+              <AuthorizedUser />
+              <Users />
+              <Photos />
+            </>
+          )}
+        />
+        <Route path="/newPhoto" component={PostPhoto} />
+        <Route component={({}) => <h1>"{location.pathname}" not found</h1>} />
+      </Switch>
     </BrowserRouter>
   );
 };

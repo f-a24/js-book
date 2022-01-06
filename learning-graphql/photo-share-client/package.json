@@ -14,25 +14,27 @@
     "arrowParens": "avoid"
   },
   "dependencies": {
-    "@apollo/client": "^3.5.5",
+    "@apollo/client": "^3.5.6",
+    "apollo-upload-client": "^17.0.0",
     "apollo3-cache-persist": "^0.13.0",
-    "graphql": "^16.0.1",
+    "graphql": "^16.2.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "react-router-dom": "5.3.0",
     "subscriptions-transport-ws": "^0.11.0"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^2.3.0",
-    "@graphql-codegen/typescript": "^2.4.1",
-    "@graphql-codegen/typescript-operations": "^2.2.1",
-    "@graphql-codegen/typescript-react-apollo": "^3.2.2",
-    "@types/react": "^17.0.0",
+    "@graphql-codegen/cli": "^2.3.1",
+    "@graphql-codegen/typescript": "^2.4.2",
+    "@graphql-codegen/typescript-operations": "^2.2.2",
+    "@graphql-codegen/typescript-react-apollo": "^3.2.3",
+    "@types/apollo-upload-client": "^17.0.0",
+    "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.0",
     "@types/react-router-dom": "^5.3.2",
-    "@vitejs/plugin-react": "^1.0.0",
-    "prettier": "^2.5.0",
-    "typescript": "^4.3.2",
-    "vite": "^2.6.4"
+    "@vitejs/plugin-react": "^1.1.4",
+    "prettier": "^2.5.1",
+    "typescript": "^4.5.4",
+    "vite": "^2.7.10"
   }
 }
