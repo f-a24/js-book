@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>【Chapter4】ImageTensor</title>
+  </head>
+  <body>
+    <h1>Crop Image Tensors</h1>
+    <div style="display: flex; justify-content: space-evenly">
+      <div>
+        <h3>
+          Actual Image
+          <pre>[348, 500, 3]</pre>
+        </h3>
+        <img id="lemonade" src="/lemonade.jpg" />
+      </div>
+      <div>
+        <h3>
+          Cropped Tensor
+          <pre>[265, 245, 3]</pre>
+        </h3>
+        <canvas id="lemonadeCanvas"></canvas>
+      </div>
+    </div>
+    <script type="module" src="main.ts"></script>
+  </body>
+</html>

@@ -36,6 +36,39 @@ export default defineConfig({
             'recommend',
             'index.html'
           ),
+          'chapter04/topixels': resolve(
+            root,
+            'chapter04',
+            'topixels',
+            'index.html'
+          ),
+          'chapter04/frompixels': resolve(
+            root,
+            'chapter04',
+            'frompixels',
+            'index.html'
+          ),
+          'chapter04/image-manipulation/mirror': resolve(
+            root,
+            'chapter04',
+            'image-manipulation',
+            'mirror',
+            'index.html'
+          ),
+          'chapter04/image-manipulation/resize': resolve(
+            root,
+            'chapter04',
+            'image-manipulation',
+            'resize',
+            'index.html'
+          ),
+          'chapter04/image-manipulation/crop': resolve(
+            root,
+            'chapter04',
+            'image-manipulation',
+            'crop',
+            'index.html'
+          ),
       }
     }
 }

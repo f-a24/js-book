@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>【Chapter4】ImageTensor</title>
+  </head>
+  <body>
+    <h1>Resize Image Tensors</h1>
+    <h3>Actual Image</h3>
+    <img id="littleGant" src="/littleGant.jpg" />
+    <h3>Resize Nearest Neighbor</h3>
+    <div>
+      <canvas id="nnCanvas" />
+    </div>
+    <h3>Resize Bilinear</h3>
+    <div>
+      <canvas id="blCanvas"></canvas>
+    </div>
+    <script type="module" src="main.ts"></script>
+  </body>
+</html>
